@@ -10,6 +10,7 @@ public class HangmanGame {
     private String currentWordTheme;
     private String[] currentWordArray;
     private String[] outputWord;
+    private Set<String> usedLetters = new HashSet<>();
     int mistakes = 0;
 
     public HangmanGame() {
@@ -30,10 +31,6 @@ public class HangmanGame {
         wordMap.put("Морепродукты", "Креветка");
         wordMap.put("Космос", "Планета");
         wordMap.put("Химия", "Кислород");
-    }
-
-    public void resetGame() {
-        mistakes = 0;
     }
 
     /**
@@ -71,7 +68,7 @@ public class HangmanGame {
             } else {
                 mistakes++;
                 if (mistakes == MAX_MISTAKES) {
-                    miss(mistakes);  // Отрисовываем последнюю стадию
+                    miss(mistakes);
                     printLossMessage();
                     return;
                 }
@@ -84,6 +81,7 @@ public class HangmanGame {
         System.out.println("\nСлово: " + String.join(" ", outputWord));
         System.out.println("Тема слова: " + currentWordTheme);
         System.out.println("Ошибки: " + mistakes);
+        printUsedLetters();
     }
 
     private String getUserInput() {
@@ -95,7 +93,7 @@ public class HangmanGame {
         if (guess.length() == currentWord.length()) {
             return checkFullWordGuess(guess);
         } else if (guess.length() == 1) {
-            return checkSingleLetterGuess(guess.charAt(0));
+            return checkSingleLetterGuess(guess);
         } else {
             System.out.println("Некорректный ввод.");
             return false;
@@ -112,14 +110,21 @@ public class HangmanGame {
         }
     }
 
-    private boolean checkSingleLetterGuess(char letter) {
+    private boolean checkSingleLetterGuess(String letter) {
         boolean isCorrect = false;
         for (int i = 0; i < currentWordArray.length; i++) {
-            if (currentWordArray[i].equalsIgnoreCase(String.valueOf(letter))) {
-                outputWord[i] = String.valueOf(letter);
+            if (currentWordArray[i].equalsIgnoreCase(letter)) {
+                if(i == 0) {
+                    outputWord[i] = letter.toUpperCase();
+                } else {
+                    outputWord[i] = letter;
+                }
                 isCorrect = true;
             }
         }
+
+        usedLetters.add(letter);
+
         if (!isCorrect) {
             System.out.println("Неверная буква.");
         }
@@ -131,7 +136,7 @@ public class HangmanGame {
     }
 
     private void printWinMessage() {
-        System.out.println();
+        System.out.println("\n\n\n\n\n");
         System.out.println("Победа! Вы угадали слово: " + currentWord);
         DefaultCommands.enter();
     }
@@ -152,5 +157,14 @@ public class HangmanGame {
             case 5 -> DefaultCommands.fiveMiss();
             case 6 -> DefaultCommands.sixMiss();
         }
+    }
+
+    private void printUsedLetters() {
+        List<String> usedLettersSort = new ArrayList<>(usedLetters);
+        Collections.sort(usedLettersSort);
+
+        System.out.print("Использованные буквы: ");
+        System.out.print(usedLettersSort);
+        System.out.println();
     }
 }
