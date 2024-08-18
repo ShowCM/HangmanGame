@@ -1,50 +1,58 @@
 import java.util.*;
 
 public class HangmanGame {
+
     Scanner scan = new Scanner(System.in);
     Random random = new Random();
 
+    private final User user = new User();
+    private final GameConsoleOutput gameConsoleOutput = new GameConsoleOutput();
+    private final ScoreHandler scoreHandler = new ScoreHandler(user);
+
     private static final int MAX_MISTAKES = 6;
-    private Map<String, String> wordMap = new LinkedHashMap<>();
+    private final Map<String, String> words = new LinkedHashMap<>();
     private String currentWord;
     private String currentWordTheme;
     private String[] currentWordArray;
     private String[] outputWord;
-    private Set<String> usedLetters = new HashSet<>();
-    int mistakes = 0;
+    private final Set<String> usedLetters = new HashSet<>();
+    private int mistakes = 0;
 
     public HangmanGame() {
+        user.setUsername();
+        scoreHandler.initializeScore();
         initializeWords();
     }
 
     private void initializeWords() {
-        wordMap.put("Фрукты", "Апельсин");
-        wordMap.put("Овощи", "Картофель");
-        wordMap.put("Животные", "Зебра");
-        wordMap.put("Города", "Москва");
-        wordMap.put("Профессии", "Доктор");
-        wordMap.put("Спорт", "Футбол");
-        wordMap.put("Техника", "Компьютер");
-        wordMap.put("Музыкальные инструменты", "Гитара");
-        wordMap.put("Птицы", "Воробей");
-        wordMap.put("Машины", "Камаз");
-        wordMap.put("Морепродукты", "Креветка");
-        wordMap.put("Космос", "Планета");
-        wordMap.put("Химия", "Кислород");
+        words.put("Фрукты", "Апельсин");
+        words.put("Овощи", "Картофель");
+        words.put("Животные", "Зебра");
+        words.put("Города", "Москва");
+        words.put("Профессии", "Доктор");
+        words.put("Спорт", "Футбол");
+        words.put("Техника", "Компьютер");
+        words.put("Музыкальные инструменты", "Гитара");
+        words.put("Птицы", "Воробей");
+        words.put("Машины", "Камаз");
+        words.put("Морепродукты", "Креветка");
+        words.put("Космос", "Планета");
+        words.put("Химия", "Кислород");
     }
 
     /**
      * Выбор случайного слова из Map<String, String> wordMap
      */
     public void selectWord() {
+        usedLetters.clear();
         mistakes = 0;
-        int randomWordIndex = random.nextInt(0, wordMap.size());
+        int randomWordIndex = random.nextInt(0, words.size());
         int counter = 0;
 
-        for (Map.Entry<String, String> item : wordMap.entrySet()) {
-            if(randomWordIndex == counter) {
-                currentWordTheme = item.getKey(); // Записываем тему слова
-                currentWord = item.getValue(); //Записываем слово
+        for (Map.Entry<String, String> item : words.entrySet()) {
+            if (randomWordIndex == counter) {
+                currentWordTheme = item.getKey();
+                currentWord = item.getValue();
                 break;
             }
             counter++;
@@ -57,46 +65,58 @@ public class HangmanGame {
 
     public void play() {
         while (mistakes < MAX_MISTAKES) {
-            miss(mistakes);
-            printGameInfo();
+            DefaultCommands.printMistakeStages(mistakes);
+            gameConsoleOutput.printGameInfo(outputWord, currentWordTheme, mistakes, usedLetters);
+
             String guess = getUserInput();
-            if (processGuess(guess)) {
+            if (processPlayerGuess(guess)) {
                 if (isWordGuessed()) {
-                    printWinMessage();
+                    scoreHandler.incrementWordScore();
+                    gameConsoleOutput.printWinMessage(currentWord);
+                    scoreHandler.updateCurrentUserScore();
                     return;
                 }
             } else {
                 mistakes++;
+                scoreHandler.incrementMistakesScore();
                 if (mistakes == MAX_MISTAKES) {
-                    miss(mistakes);
-                    printLossMessage();
+                    DefaultCommands.printMistakeStages(mistakes);
+                    gameConsoleOutput.printLossMessage(currentWord);
+                    scoreHandler.updateCurrentUserScore();
                     return;
                 }
             }
         }
     }
 
-
-    private void printGameInfo() {
-        System.out.println("\nСлово: " + String.join(" ", outputWord));
-        System.out.println("Тема слова: " + currentWordTheme);
-        System.out.println("Ошибки: " + mistakes);
-        printUsedLetters();
-    }
-
-    private String getUserInput() {
+    public String getUserInput() {
         System.out.print("\nВведите букву или слово: ");
-        return scan.nextLine();
+
+        return scan.nextLine().toLowerCase();
     }
 
-    private boolean processGuess(String guess) {
+    private boolean processPlayerGuess(String guess) {
         if (guess.length() == currentWord.length()) {
             return checkFullWordGuess(guess);
         } else if (guess.length() == 1) {
+            validateUserInput(guess);
             return checkSingleLetterGuess(guess);
         } else {
-            System.out.println("Некорректный ввод.");
+            validateUserInput(guess);
             return false;
+        }
+    }
+
+    private void validateUserInput(String guess) {
+        if (guess.isBlank() && guess.isEmpty()) {
+            System.out.println("\n\nВвод не может быть пустым.");
+            play();
+        } else if (!guess.matches("[а-яё]")) {
+            play();
+            System.out.println("\n\nМожно вводить только символы А-Я");
+        } else if (usedLetters.contains(guess)) {
+            play();
+            System.out.println("\n\nТакая буква уже была.");
         }
     }
 
@@ -114,11 +134,12 @@ public class HangmanGame {
         boolean isCorrect = false;
         for (int i = 0; i < currentWordArray.length; i++) {
             if (currentWordArray[i].equalsIgnoreCase(letter)) {
-                if(i == 0) {
-                    outputWord[i] = letter.toUpperCase();
+                if (i == 0) {
+                    outputWord[i] = letter.toUpperCase(); // toUpper нужно в конце для проверки загаданного и угаданного слова
                 } else {
                     outputWord[i] = letter;
                 }
+                scoreHandler.incrementLetterScore();
                 isCorrect = true;
             }
         }
@@ -135,36 +156,7 @@ public class HangmanGame {
         return Arrays.equals(outputWord, currentWordArray);
     }
 
-    private void printWinMessage() {
-        System.out.println("\n\n\n\n\n");
-        System.out.println("Победа! Вы угадали слово: " + currentWord);
-        DefaultCommands.enter();
-    }
-
-    private void printLossMessage() {
-        System.out.println();
-        System.out.println("Поражение. Вы не угадали слово: " + currentWord);
-        DefaultCommands.enter();
-    }
-
-    public static void miss(int mistakes) {
-        switch (mistakes) {
-            case 0 -> DefaultCommands.zeroMiss();
-            case 1 -> DefaultCommands.oneMiss();
-            case 2 -> DefaultCommands.twoMiss();
-            case 3 -> DefaultCommands.threeMiss();
-            case 4 -> DefaultCommands.fourMiss();
-            case 5 -> DefaultCommands.fiveMiss();
-            case 6 -> DefaultCommands.sixMiss();
-        }
-    }
-
-    private void printUsedLetters() {
-        List<String> usedLettersSort = new ArrayList<>(usedLetters);
-        Collections.sort(usedLettersSort);
-
-        System.out.print("Использованные буквы: ");
-        System.out.print(usedLettersSort);
-        System.out.println();
+    public void getLeaderboardTable() {
+        user.getLeaderboardTable();
     }
 }

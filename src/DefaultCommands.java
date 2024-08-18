@@ -1,25 +1,7 @@
 public class DefaultCommands {
 
-    public static void enter() {
-        System.out.println();
-        System.out.println("Чтобы выйти нажмите Enter...");
-        Hangman.scan.nextLine();
-        Hangman.scan.nextLine();
-        Hangman.switches();
-    }
-
-    public static void gameHello() {
-        System.out.println("""
-         ██   ██  █████  ███    ██  ██████  ███    ███  █████  ███    ██      ██████   █████  ███    ███ ███████\s
-         ██   ██ ██   ██ ████   ██ ██       ████  ████ ██   ██ ████   ██     ██       ██   ██ ████  ████ ██     \s
-         ███████ ███████ ██ ██  ██ ██   ███ ██ ████ ██ ███████ ██ ██  ██     ██   ███ ███████ ██ ████ ██ █████  \s
-         ██   ██ ██   ██ ██  ██ ██ ██    ██ ██  ██  ██ ██   ██ ██  ██ ██     ██    ██ ██   ██ ██  ██  ██ ██     \s
-         ██   ██ ██   ██ ██   ████  ██████  ██      ██ ██   ██ ██   ████      ██████  ██   ██ ██      ██ ███████\s
-         """);
-    }
-
-    public static void zeroMiss() {
-        System.out.println("""
+    private static final String[] stages = {
+        """
                                ██                                           \s
                          █████████████████████████████████                  \s
                                ██   ███          ██                         \s
@@ -36,11 +18,8 @@ public class DefaultCommands {
                                ██                                           \s
                                ██                                           \s
                                                                             \s
-         """);
-    }
-
-    public static void oneMiss() {
-        System.out.println("""
+        """,
+        """
                                ██                                           \s
                          █████████████████████████████████                  \s
                                ██   ███          ██                         \s
@@ -57,11 +36,8 @@ public class DefaultCommands {
                                ██                                           \s
                                ██                                           \s
                                                                             \s
-         """);
-    }
-
-    public static void twoMiss() {
-        System.out.println("""
+        """,
+        """
                                ██                                           \s
                          █████████████████████████████████                  \s
                                ██   ███          ██                         \s
@@ -78,10 +54,8 @@ public class DefaultCommands {
                                ██                                           \s
                                ██                                           \s
                                                                             \s
-         """);
-    }
-    public static void threeMiss() {
-        System.out.println("""
+        """,
+        """
                                ██                                           \s
                          █████████████████████████████████                  \s
                                ██   ███          ██                         \s
@@ -98,10 +72,8 @@ public class DefaultCommands {
                                ██                                           \s
                                ██                                           \s
                                                                             \s
-         """);
-    }
-    public static void fourMiss() {
-        System.out.println("""
+        """,
+        """
                                ██                                           \s
                          █████████████████████████████████                  \s
                                ██   ███          ██                         \s
@@ -118,10 +90,8 @@ public class DefaultCommands {
                                ██                                           \s
                                ██                                           \s
                                                                             \s
-         """);
-    }
-    public static void fiveMiss() {
-        System.out.println("""
+        """,
+        """
                                ██                                           \s
                          █████████████████████████████████                  \s
                                ██   ███          ██                         \s
@@ -138,11 +108,8 @@ public class DefaultCommands {
                                ██                                           \s
                                ██                                           \s
                                                                             \s
-         """);
-
-    }
-    public static void sixMiss() {
-        System.out.println("""
+        """,
+        """
                                                                             \s
                                                                             \s
                                                                             \s
@@ -167,6 +134,28 @@ public class DefaultCommands {
                                ██                                           \s
                                ██                                           \s
                                                                             \s
+        """,
+    };
+
+    public static void printMistakeStages(int miss) {
+        System.out.println(stages[miss]);
+    }
+
+    public static void enter() {
+        System.out.println();
+        System.out.println("Чтобы выйти нажмите Enter...");
+        Hangman.scan.nextLine();
+        Hangman.scan.nextLine();
+        Hangman.switches();
+    }
+
+    public static void gameHello() {
+        System.out.println("""
+         ██   ██  █████  ███    ██  ██████  ███    ███  █████  ███    ██      ██████   █████  ███    ███ ███████\s
+         ██   ██ ██   ██ ████   ██ ██       ████  ████ ██   ██ ████   ██     ██       ██   ██ ████  ████ ██     \s
+         ███████ ███████ ██ ██  ██ ██   ███ ██ ████ ██ ███████ ██ ██  ██     ██   ███ ███████ ██ ████ ██ █████  \s
+         ██   ██ ██   ██ ██  ██ ██ ██    ██ ██  ██  ██ ██   ██ ██  ██ ██     ██    ██ ██   ██ ██  ██  ██ ██     \s
+         ██   ██ ██   ██ ██   ████  ██████  ██      ██ ██   ██ ██   ████      ██████  ██   ██ ██      ██ ███████\s
          """);
     }
 }
