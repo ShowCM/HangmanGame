@@ -112,11 +112,11 @@ public class HangmanGame {
             System.out.println("\n\nВвод не может быть пустым.");
             play();
         } else if (!guess.matches("[а-яё]")) {
-            play();
             System.out.println("\n\nМожно вводить только символы А-Я");
-        } else if (usedLetters.contains(guess)) {
             play();
+        } else if (usedLetters.contains(guess)) {
             System.out.println("\n\nТакая буква уже была.");
+            play();
         }
     }
 
